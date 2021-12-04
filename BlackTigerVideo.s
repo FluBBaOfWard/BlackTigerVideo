@@ -378,7 +378,7 @@ convertBgrMapBlkTgr:		;@ r0 = destination
 	cmp r0,#0
 	blne bgrReload
 
-	ldr r1,=g_scaling
+	ldr r1,=gScaling
 	ldrb r1,[r1]
 	cmp r1,#UNSCALED
 	moveq r11,#SCREEN_HEIGHT
@@ -748,7 +748,7 @@ convertSpritesBlkTgr:		;@ in r0 = destination.
 	ldr r10,[btptr,#gfxRAM]
 	add r10,r10,#0x6E00			;@ Source
 
-	ldr r7,=g_scaling
+	ldr r7,=gScaling
 	ldrb r7,[r7]
 	cmp r7,#UNSCALED			;@ Do autoscroll
 	ldreq r7,=0x01000000		;@ No scaling
