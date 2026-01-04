@@ -31,7 +31,7 @@
 	.arm
 
 #ifdef GBA
-	.section .ewram, "ax"		;@ For the GBA
+	.section .ewram, "ax", %progbits	;@ For the GBA
 #else
 	.section .text
 #endif
@@ -39,29 +39,25 @@
 ;@----------------------------------------------------------------------------
 blkTgrInit:					;@ Only need to be called once
 ;@----------------------------------------------------------------------------
+	ldr r0,=CHR_DECODE			;@ Destination 0x400
 	mov r1,#0xffffff00			;@ Build chr decode tbl
-	ldr r2,=CHR_DECODE			;@ 0x400
-ppi:
-	mov r0,#0
-	tst r1,#0x01
-	orreq r0,r0,#0x2000
-	tst r1,#0x02
-	orreq r0,r0,#0x0200
-	tst r1,#0x04
-	orreq r0,r0,#0x0020
-	tst r1,#0x08
-	orreq r0,r0,#0x0002
-	tst r1,#0x10
-	orreq r0,r0,#0x1000
-	tst r1,#0x20
-	orreq r0,r0,#0x0100
-	tst r1,#0x40
-	orreq r0,r0,#0x0010
-	tst r1,#0x80
-	orreq r0,r0,#0x0001
-	str r0,[r2],#4
+chrLutLoop:
+	mov r2,#0
+	tst r1,r1,lsl#31
+	orrpl r2,r2,#0x2000
+	orrcc r2,r2,#0x0200
+	tst r1,r1,lsl#29
+	orrpl r2,r2,#0x0020
+	orrcc r2,r2,#0x0002
+	tst r1,r1,lsl#27
+	orrpl r2,r2,#0x1000
+	orrcc r2,r2,#0x0100
+	tst r1,r1,lsl#25
+	orrpl r2,r2,#0x0010
+	orrcc r2,r2,#0x0001
+	str r2,[r0],#4
 	adds r1,r1,#1
-	bne ppi
+	bne chrLutLoop
 
 	bx lr
 ;@----------------------------------------------------------------------------
@@ -452,7 +448,7 @@ lineStateTable:
 ;@ Code in fastmem.
 ;@----------------------------------------------------------------------------
 #ifdef NDS
-	.section .itcm						;@ For the NDS
+	.section .itcm, "ax", %progbits		;@ For the NDS
 #elif GBA
 	.section .iwram, "ax", %progbits	;@ For the GBA
 #endif
@@ -729,7 +725,7 @@ reloadSprites:
 	mov r2,#SPRBLOCKCOUNT			;@ Tile entries
 	b memset_						;@ prepare lut
 ;@----------------------------------------------------------------------------
-	.equ PRIORITY,	0x800		;@ 0x800=AGB OBJ priority 2
+	.equ PRIORITY,	0x800	;@ 0x800=AGB OBJ priority 2
 ;@----------------------------------------------------------------------------
 convertSpritesBlkTgr:		;@ in r0 = destination.
 ;@----------------------------------------------------------------------------
@@ -862,7 +858,7 @@ spr1:
 ;@----------------------------------------------------------------------------
 
 #ifdef GBA
-	.section .sbss				;@ For the GBA
+	.section .sbss				;@ This is EWRAM on GBA with devkitARM
 #else
 	.section .bss
 #endif

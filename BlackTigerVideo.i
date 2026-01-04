@@ -1,5 +1,8 @@
 ;@ ASM header for the Capcom BlackTigerVideo emulator
 ;@
+#if !__ASSEMBLER__
+	#error This header file is only for use in assembly files!
+#endif
 
 /** \brief  Game screen height in pixels */
 #define GAME_HEIGHT (224)
